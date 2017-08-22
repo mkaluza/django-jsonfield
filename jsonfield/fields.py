@@ -92,6 +92,14 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
 
         return value
 
+    def from_db_value(self, value, expression, connection, context):
+        if isinstance(value, six.string_types):
+            try:
+                return json.loads(value, **self.load_kwargs)
+            except ValueError:
+                raise ValidationError(_("Enter valid JSON"))
+        return value
+
     def to_python(self, value):
         """The SubfieldBase metaclass calls pre_init instead of to_python, however to_python
         is still necessary for Django's deserializer"""
